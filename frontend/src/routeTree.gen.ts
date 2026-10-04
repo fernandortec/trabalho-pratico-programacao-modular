@@ -10,33 +10,115 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ConsultasRouteImport } from './routes/consultas'
+import { Route as InformacoesRouteImport } from './routes/informacoes'
+import { Route as InternacoesRouteImport } from './routes/internacoes'
+import { Route as PacientesRouteImport } from './routes/pacientes'
+import { Route as ProfissionaisRouteImport } from './routes/profissionais'
+import { Route as QuartosRouteImport } from './routes/quartos'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConsultasRoute = ConsultasRouteImport.update({
+  id: '/consultas',
+  path: '/consultas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InformacoesRoute = InformacoesRouteImport.update({
+  id: '/informacoes',
+  path: '/informacoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InternacoesRoute = InternacoesRouteImport.update({
+  id: '/internacoes',
+  path: '/internacoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PacientesRoute = PacientesRouteImport.update({
+  id: '/pacientes',
+  path: '/pacientes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfissionaisRoute = ProfissionaisRouteImport.update({
+  id: '/profissionais',
+  path: '/profissionais',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QuartosRoute = QuartosRouteImport.update({
+  id: '/quartos',
+  path: '/quartos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/consultas': typeof ConsultasRoute
+  '/informacoes': typeof InformacoesRoute
+  '/internacoes': typeof InternacoesRoute
+  '/pacientes': typeof PacientesRoute
+  '/profissionais': typeof ProfissionaisRoute
+  '/quartos': typeof QuartosRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/consultas': typeof ConsultasRoute
+  '/informacoes': typeof InformacoesRoute
+  '/internacoes': typeof InternacoesRoute
+  '/pacientes': typeof PacientesRoute
+  '/profissionais': typeof ProfissionaisRoute
+  '/quartos': typeof QuartosRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/consultas': typeof ConsultasRoute
+  '/informacoes': typeof InformacoesRoute
+  '/internacoes': typeof InternacoesRoute
+  '/pacientes': typeof PacientesRoute
+  '/profissionais': typeof ProfissionaisRoute
+  '/quartos': typeof QuartosRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/consultas'
+    | '/informacoes'
+    | '/internacoes'
+    | '/pacientes'
+    | '/profissionais'
+    | '/quartos'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/consultas'
+    | '/informacoes'
+    | '/internacoes'
+    | '/pacientes'
+    | '/profissionais'
+    | '/quartos'
+  id:
+    | '__root__'
+    | '/'
+    | '/consultas'
+    | '/informacoes'
+    | '/internacoes'
+    | '/pacientes'
+    | '/profissionais'
+    | '/quartos'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ConsultasRoute: typeof ConsultasRoute
+  InformacoesRoute: typeof InformacoesRoute
+  InternacoesRoute: typeof InternacoesRoute
+  PacientesRoute: typeof PacientesRoute
+  ProfissionaisRoute: typeof ProfissionaisRoute
+  QuartosRoute: typeof QuartosRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +130,59 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/consultas': {
+      id: '/consultas'
+      path: '/consultas'
+      fullPath: '/consultas'
+      preLoaderRoute: typeof ConsultasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/informacoes': {
+      id: '/informacoes'
+      path: '/informacoes'
+      fullPath: '/informacoes'
+      preLoaderRoute: typeof InformacoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/internacoes': {
+      id: '/internacoes'
+      path: '/internacoes'
+      fullPath: '/internacoes'
+      preLoaderRoute: typeof InternacoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pacientes': {
+      id: '/pacientes'
+      path: '/pacientes'
+      fullPath: '/pacientes'
+      preLoaderRoute: typeof PacientesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profissionais': {
+      id: '/profissionais'
+      path: '/profissionais'
+      fullPath: '/profissionais'
+      preLoaderRoute: typeof ProfissionaisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quartos': {
+      id: '/quartos'
+      path: '/quartos'
+      fullPath: '/quartos'
+      preLoaderRoute: typeof QuartosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ConsultasRoute: ConsultasRoute,
+  InformacoesRoute: InformacoesRoute,
+  InternacoesRoute: InternacoesRoute,
+  PacientesRoute: PacientesRoute,
+  ProfissionaisRoute: ProfissionaisRoute,
+  QuartosRoute: QuartosRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
