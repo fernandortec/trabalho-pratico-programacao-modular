@@ -1,20 +1,9 @@
-<mxfile host="app.diagrams.net" pages="2">
-  <diagram name="Page-1" id="JWIUOpbZbYZP7QyIKpH1">
-    <mxGraphModel grid="1" page="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
-      <root>
-        <mxCell id="0" />
-        <mxCell id="1" parent="0" />
-      </root>
-    </mxGraphModel>
-  </diagram>
+<mxfile host="app.diagrams.net">
   <diagram id="4xJlcafhXLJbkwQ_hhWI" name="Page-2">
-    <mxGraphModel grid="1" page="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="2015" dy="597" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="im9e4c4Bh3MX8n_J-dmp-31" edge="1" parent="1" source="im9e4c4Bh3MX8n_J-dmp-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="im9e4c4Bh3MX8n_J-dmp-29">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
         <mxCell id="im9e4c4Bh3MX8n_J-dmp-42" edge="1" parent="1" source="im9e4c4Bh3MX8n_J-dmp-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=diamondThin;endFill=0;endSize=26;">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="315" y="820" as="targetPoint" />
@@ -31,11 +20,8 @@
         <mxCell id="im9e4c4Bh3MX8n_J-dmp-14" parent="1" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" value="Paciente" vertex="1">
           <mxGeometry height="280" width="160" x="40" y="500" as="geometry" />
         </mxCell>
-        <mxCell id="im9e4c4Bh3MX8n_J-dmp-15" parent="im9e4c4Bh3MX8n_J-dmp-14" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;whiteSpace=wrap;" value="- cpf String&lt;br&gt;&lt;div&gt;- dataNascimento Date&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+        <mxCell id="im9e4c4Bh3MX8n_J-dmp-15" parent="im9e4c4Bh3MX8n_J-dmp-14" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;whiteSpace=wrap;" value="- cpf String&lt;br&gt;&lt;div&gt;- dataNascimento Date&lt;/div&gt;&lt;div&gt;- nome String&lt;br&gt;&lt;div&gt;- telefone String&lt;/div&gt;&lt;div&gt;- email String&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
           <mxGeometry height="230" width="160" y="50" as="geometry" />
-        </mxCell>
-        <mxCell id="im9e4c4Bh3MX8n_J-dmp-32" edge="1" parent="1" source="im9e4c4Bh3MX8n_J-dmp-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="im9e4c4Bh3MX8n_J-dmp-29" value="">
-          <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="im9e4c4Bh3MX8n_J-dmp-40" edge="1" parent="1" source="im9e4c4Bh3MX8n_J-dmp-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=default;endArrow=none;endFill=0;" target="im9e4c4Bh3MX8n_J-dmp-36">
           <mxGeometry relative="1" as="geometry" />
@@ -48,7 +34,7 @@
         <mxCell id="im9e4c4Bh3MX8n_J-dmp-16" parent="1" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" value="ProfissionalSaude" vertex="1">
           <mxGeometry height="280" width="160" x="-170" y="500" as="geometry" />
         </mxCell>
-        <mxCell id="im9e4c4Bh3MX8n_J-dmp-17" parent="im9e4c4Bh3MX8n_J-dmp-16" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;whiteSpace=wrap;" value="- registro String&lt;br&gt;&lt;div&gt;- especialidade String&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+        <mxCell id="im9e4c4Bh3MX8n_J-dmp-17" parent="im9e4c4Bh3MX8n_J-dmp-16" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;whiteSpace=wrap;" value="- registro String&lt;br&gt;&lt;div&gt;- especialidade String&lt;/div&gt;&lt;div&gt;- nome String&lt;br&gt;&lt;div&gt;- telefone String&lt;/div&gt;&lt;div&gt;- email String&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
           <mxGeometry height="230" width="160" y="50" as="geometry" />
         </mxCell>
         <mxCell id="im9e4c4Bh3MX8n_J-dmp-21" parent="1" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" value="Internacao" vertex="1">
@@ -74,12 +60,6 @@
         </mxCell>
         <mxCell id="im9e4c4Bh3MX8n_J-dmp-28" parent="im9e4c4Bh3MX8n_J-dmp-27" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;whiteSpace=wrap;" value="&lt;div&gt;- dataHora LocalDateTime&lt;/div&gt;&lt;div&gt;- titulo String&lt;/div&gt;&lt;div&gt;- descricao String&lt;/div&gt;&lt;div&gt;- consulta Consulta&lt;/div&gt;&lt;div&gt;- profissional Profissional&lt;/div&gt;&lt;div&gt;- esteveInternado boolean&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
           <mxGeometry height="230" width="220" y="50" as="geometry" />
-        </mxCell>
-        <mxCell id="im9e4c4Bh3MX8n_J-dmp-29" parent="1" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" value="Usuario" vertex="1">
-          <mxGeometry height="280" width="160" x="-70" y="160" as="geometry" />
-        </mxCell>
-        <mxCell id="im9e4c4Bh3MX8n_J-dmp-30" parent="im9e4c4Bh3MX8n_J-dmp-29" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;whiteSpace=wrap;" value="- nome String&lt;br&gt;&lt;div&gt;- telefone String&lt;/div&gt;&lt;div&gt;- email String&lt;/div&gt;" vertex="1">
-          <mxGeometry height="230" width="160" y="50" as="geometry" />
         </mxCell>
         <mxCell id="im9e4c4Bh3MX8n_J-dmp-36" parent="1" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" value="Consulta" vertex="1">
           <mxGeometry height="280" width="210" x="-95" y="820" as="geometry" />
