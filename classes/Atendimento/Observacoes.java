@@ -23,4 +23,32 @@ public class Observacoes {
         this.dataHora = dataHora;
         this.esteveInternado = esteveInternado;
     }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getTitulo() {
+        return titulo;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public Profissional getProfissional() {
+        return profissional;
+    }
+
+    public Atendimento getConsulta() {
+        return consulta;
+    }
+
+    public LocalDateTime getDataHora() {
+        return dataHora;
+    }
+
+    public boolean isEsteveInternado() {
+        return esteveInternado;
+    }
 }
