@@ -29,6 +29,20 @@ public class TratadorDeErros {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(corpo);
     }
 
+    // regra de negócio violada (ex: CPF inválido, especialidade incompatível) -> 400
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErroResposta> tratarArgumentoInvalido(IllegalArgumentException excecao) {
+        ErroResposta corpo = new ErroResposta(excecao.getMessage(), List.of());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(corpo);
+    }
+
+    // violação de unicidade (CRM ou CPF duplicado) -> 409
+    @ExceptionHandler(RegistroDuplicadoException.class)
+    public ResponseEntity<ErroResposta> tratarRegistroDuplicado(RegistroDuplicadoException excecao) {
+        ErroResposta corpo = new ErroResposta(excecao.getMessage(), List.of());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(corpo);
+    }
+
     // por exemplo, remover um paciente que ainda tem consultas -> 409
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErroResposta> tratarConflito(DataIntegrityViolationException excecao) {

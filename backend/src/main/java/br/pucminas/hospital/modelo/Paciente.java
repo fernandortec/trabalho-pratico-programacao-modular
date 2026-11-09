@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 
 // @Entity faz o jpa criar uma tabela "paciente" no banco para esta classe
 @Entity
@@ -23,6 +24,7 @@ public class Paciente {
     private String cpf;
 
     @NotNull(message = "é obrigatório")
+    @PastOrPresent(message = "a data de nascimento não pode estar no futuro (RN-PAC-01)")
     private LocalDate dataNascimento;
 
     @NotBlank(message = "é obrigatório")
