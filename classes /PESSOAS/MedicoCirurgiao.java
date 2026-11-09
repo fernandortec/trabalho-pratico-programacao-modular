@@ -1,12 +1,15 @@
 package PESSOAS;
 
-import ENUMS.AreaAtuacaoCirurgica;
+public class MedicoCirurgiao extends Profissional {
+    private String areaCirurgia;
 
-public class MedicoCirurgiao extends Profissional{
-    private AreaAtuacaoCirurgica areaCirurgica;
+    public MedicoCirurgiao(String registro, String nome, String telefone,
+            String email, String areaCirurgia) {
+        super(registro, nome, telefone, email);
+        this.areaCirurgia = areaCirurgia;
+    }
 
-    public MedicoCirurgiao(String registro,String nome,String telefone,String email,AreaAtuacaoCirurgica areaCirurgica){
-        super(registro,nome,telefone,email);
-        this.areaCirurgica = areaCirurgica;
+    public String getAreaCirurgia() {
+        return this.areaCirurgia;
     }
 }

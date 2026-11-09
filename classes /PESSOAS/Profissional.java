@@ -1,5 +1,5 @@
 package PESSOAS;
-public class Profissional {
+public abstract class Profissional {
     private String registro;
     private String nome;
     private String telefone;
@@ -10,6 +10,14 @@ public class Profissional {
         this.nome = nome;
         this.telefone = telefone;
         this.email = email;
+    }
+
+    public String getRegistro(){
+        return this.registro;
+    }
+
+    public void avaliarPaciente(Paciente paciente){
+
     }
     
 }
