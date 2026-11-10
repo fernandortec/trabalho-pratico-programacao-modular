@@ -50,4 +50,10 @@ public class TratadorDeErros {
                 "a operação não pode ser feita porque o registro está ligado a outros registros", List.of());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(corpo);
     }
+    @ExceptionHandler({IllegalStateException.class, org.springframework.dao.OptimisticLockingFailureException.class,
+            org.springframework.dao.PessimisticLockingFailureException.class})
+    public ResponseEntity<ErroResposta> tratarEstadoInvalido(RuntimeException excecao) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new ErroResposta(excecao.getMessage(), List.of()));
+    }
 }

@@ -9,12 +9,12 @@ public abstract class Profissional {
     protected Profissional(String registro, String nome, String telefone, String email) {
         this.registro = obrigatorio(registro, "Registro profissional");
         this.nome = obrigatorio(nome, "Nome");
-        this.telefone = obrigatorio(telefone, "Telefone");
-        this.email = obrigatorio(email, "E-mail");
-        if (!this.telefone.replaceAll("\\D", "").matches("[0-9]{10,11}")) {
+        this.telefone = telefone == null ? null : telefone.trim();
+        this.email = email == null ? null : email.trim();
+        if (this.telefone != null && !this.telefone.isBlank() && !this.telefone.replaceAll("\\D", "").matches("[0-9]{10,11}")) {
             throw new IllegalArgumentException("Telefone deve conter DDD e número.");
         }
-        if (!this.email.matches("[^\\s@]+@[^\\s@]+\\.[^\\s@]+")) {
+        if (this.email != null && !this.email.isBlank() && !this.email.matches("[^\\s@]+@[^\\s@]+\\.[^\\s@]+")) {
             throw new IllegalArgumentException("E-mail inválido.");
         }
     }

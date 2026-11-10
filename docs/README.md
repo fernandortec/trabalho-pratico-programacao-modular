@@ -13,10 +13,11 @@ As regras do domínio Java foram implementadas em `classes/`, com um projeto Mav
 independente e testes JUnit 5. O guia [Domínio da Sprint 2](./DOMINIO_SPRINT2.md)
 descreve o escopo, as interfaces e a validação.
 
-A API Spring Boot ainda usa modelos próprios e não executa esse domínio. Estão
-implementados os endpoints de pacientes, profissionais e quartos. Consultas e
-internações na API são pendências de integração. O frontend usa `localStorage`
-para demonstração e não consome a API.
+A API Spring Boot mantém seus modelos de persistência e utiliza as classes de
+`classes/` para validar e executar as operações de atendimento. As rotas existentes
+foram preservadas, com ações adicionais de consultas, altas e observações, além de
+emergências, cirurgias, encaminhamentos e histórico. Consulte o [guia do backend](../backend/README.md).
+O frontend continua usando `localStorage` e não foi integrado à API nesta etapa.
 
 **Tipos de quartos:** os PDFs não definem categorias ou restrições por tipo;
 essa definição precisa ser esclarecida com o professor. O domínio implementa
@@ -81,7 +82,7 @@ trabalho-pratico-programacao-modular/
 ### 1. Categorias de Profissionais de Saúde
 * **Profissional (Superclasse):** Contém registro profissional único (CRM), nome, telefone e e-mail.
 * **Médico Clínico Geral:** Realiza consultas de rotina, avaliações iniciais e pode encaminhar pacientes para especialistas.
-* **Médico Especialista:** Possui uma `AreaAtuacao` associada (`CARDIOLOGIA`, `NEUROLOGIA`, `ORTOPEDIA`). A API permite filtrar os cadastros por especialidade; esse cadastro ainda não está integrado à hierarquia do domínio.
+* **Médico Especialista:** Possui uma `AreaAtuacao` associada (`CARDIOLOGIA`, `NEUROLOGIA`, `ORTOPEDIA`). A API permite filtrar os cadastros por especialidade; o cadastro é convertido para a classe de domínio correspondente ao executar as operações.
 * **Médico Cirurgião:** Possui uma `AreaAtuacaoCirurgica` (`CIRURGIA_GERAL`, `CIRURGIA_CARDIOVASCULAR`, `NEUROCIRURGIA`). É o único profissional habilitado a ser o cirurgião responsável por procedimentos cirúrgicos.
 
 ### 2. Modalidades de Atendimento (Polimorfismo)
@@ -141,7 +142,7 @@ stateDiagram-v2
 
 ## 🌐 Endpoints da API REST
 
-A API Spring Boot disponibiliza os endpoints de pacientes, profissionais e quartos abaixo. As linhas marcadas como **pendente** descrevem a integração futura:
+A API preserva os cadastros existentes e expõe as ações do domínio. Os corpos de requisição e as demais rotas estão no [guia do backend](../backend/README.md):
 
 | Método | Endpoint | Descrição |
 | :--- | :--- | :--- |
@@ -149,10 +150,10 @@ A API Spring Boot disponibiliza os endpoints de pacientes, profissionais e quart
 | `GET / PUT / DELETE` | `/pacientes/{id}` | Busca, atualização e remoção de paciente por ID |
 | `GET / POST` | `/profissionais` | Listagem e cadastro de profissionais com especialidades e CRM |
 | `GET / PUT / DELETE` | `/profissionais/{id}` | Busca, atualização e remoção de profissional de saúde |
-| `GET / POST` | `/consultas` **(pendente)** | Listagem e agendamento de consultas de rotina e especializadas |
-| `PATCH` | `/consultas/{id}/situacao` **(pendente)** | Transição controlada de situação (confirmar, iniciar, concluir, cancelar) |
-| `GET / POST` | `/internacoes` **(pendente)** | Gestão de internações hospitalares e alocação de leitos |
-| `PATCH` | `/internacoes/{id}/alta` **(pendente)** | Registro de alta médica com liberação automática do quarto |
+| `GET / POST` | `/consultas` | Listagem e agendamento de consultas de rotina e especializadas |
+| `PATCH` | `/consultas/{id}/confirmar, /iniciar, /concluir, /cancelar ou /ausencia` | Transição controlada de situação (confirmar, iniciar, concluir, cancelar) |
+| `GET / POST` | `/internacoes` | Gestão de internações hospitalares e alocação de leitos |
+| `PATCH` | `/internacoes/{id}/alta` | Registro de alta médica com liberação automática do quarto |
 | `GET / POST` | `/quartos` | Listagem de quartos e controle de disponibilidade e capacidade |
 
 ---
@@ -168,11 +169,11 @@ A API Spring Boot disponibiliza os endpoints de pacientes, profissionais e quart
 
 ### 1. Executando o Backend (Spring Boot)
 
-Abra o terminal na pasta `backend`:
+Abra o terminal na raiz do projeto:
 
 ```powershell
-cd backend
-mvn spring-boot:run
+mvn clean package
+java -jar backend/target/hospital-api-0.0.1-SNAPSHOT.jar
 ```
 
 A API estará disponível em:  
@@ -215,7 +216,7 @@ O Maven compila as pastas Java atuais e executa os testes em
 ## 📂 Estrutura de Pastas
 
 - `classes/`: domínio Java, demonstração `Main`, `pom.xml` e testes em `src/test/java`.
-- `backend/`: API Spring Boot, modelos JPA próprios e testes de pacientes/profissionais.
+- `backend/`: API Spring Boot, modelos JPA, integração com o domínio e testes das rotas e serviços.
 - `frontend/`: interface React com dados locais de demonstração.
 - `docs/`: documentação e diagrama da Sprint 2.
 

@@ -54,4 +54,9 @@ public class InternacaoControle {
     public void remover(@PathVariable Long id) {
         servico.remover(id);
     }
+    @org.springframework.web.bind.annotation.PatchMapping("/{id}/alta")
+    public Internacao darAlta(@PathVariable Long id,
+            @Valid @RequestBody br.pucminas.hospital.dto.AltaRequisicao dados) {
+        return servico.darAlta(id, dados.dataAlta());
+    }
 }

@@ -25,6 +25,14 @@ public class Quarto {
     // se o json não trouxer este campo, o quarto começa disponível
     private Boolean disponivel = true;
 
+    @jakarta.persistence.Transient
+    private int ocupacaoAtual;
+
+    public int getOcupacaoAtual() { return ocupacaoAtual; }
+    public void setOcupacaoAtual(int ocupacaoAtual) { this.ocupacaoAtual = ocupacaoAtual; }
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    public boolean isHabilitado() { return !Boolean.FALSE.equals(disponivel); }
+
     public Integer getNumeroId() {
         return numeroId;
     }
@@ -50,7 +58,7 @@ public class Quarto {
     }
 
     public Boolean getDisponivel() {
-        return disponivel;
+        return isHabilitado() && capacidadeMax != null && ocupacaoAtual < capacidadeMax;
     }
 
     public void setDisponivel(Boolean disponivel) {

@@ -54,4 +54,8 @@ public class ConsultaControle {
     public void remover(@PathVariable Long id) {
         servico.remover(id);
     }
+    @org.springframework.web.bind.annotation.PatchMapping("/{id}/{acao:confirmar|iniciar|concluir|cancelar|ausencia}")
+    public Consulta alterarSituacao(@PathVariable Long id, @PathVariable String acao) {
+        return servico.alterarSituacao(id, acao);
+    }
 }

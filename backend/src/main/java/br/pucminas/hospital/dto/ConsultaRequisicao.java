@@ -11,5 +11,8 @@ public record ConsultaRequisicao(
         @NotNull(message = "é obrigatório") Long pacienteId,
         @NotNull(message = "é obrigatório") Long profissionalId,
         @NotNull(message = "é obrigatório") LocalDateTime dataHora,
-        @NotBlank(message = "é obrigatório") String motivo) {
+        @NotBlank(message = "é obrigatório") String motivo, ENUMS.AreaAtuacao area) {
+    public ConsultaRequisicao(Long pacienteId, Long profissionalId, LocalDateTime dataHora, String motivo) {
+        this(pacienteId, profissionalId, dataHora, motivo, null);
+    }
 }

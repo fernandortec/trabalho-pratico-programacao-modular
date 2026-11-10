@@ -22,6 +22,11 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>br.pucminas</groupId>
+            <artifactId>hospital-dominio</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
         <!-- api rest (controllers, json) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

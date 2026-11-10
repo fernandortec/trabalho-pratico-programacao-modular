@@ -12,4 +12,7 @@ public interface PacienteRepositorio extends JpaRepository<Paciente, Long> {
     boolean existsByCpf(String cpf);
 
     boolean existsByCpfAndIdNot(String cpf, Long id);
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @org.springframework.data.jpa.repository.Query("select registro from Paciente registro where registro.id = :id")
+    java.util.Optional<Paciente> buscarParaAtualizar(@org.springframework.data.repository.query.Param("id") Long id);
 }

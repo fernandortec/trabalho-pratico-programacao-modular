@@ -31,6 +31,22 @@ public class ProcedimentoCirurgico extends Atendimento {
         this.dataHoraPrevista = dataHoraPrevista;
     }
 
+    public static ProcedimentoCirurgico reconstituir(String id, Paciente paciente, Profissional profissional,
+            AreaAtuacaoCirurgica tipoCirurgia, String descricao, LocalDateTime dataHoraPrevista,
+            SituacaoProcedimento situacao, LocalDateTime dataHoraEfetiva) {
+        ProcedimentoCirurgico procedimento = new ProcedimentoCirurgico(id, paciente, profissional,
+                tipoCirurgia, descricao, dataHoraPrevista);
+        if (situacao == null
+                || (situacao == SituacaoProcedimento.AGENDADO && dataHoraEfetiva != null)
+                || ((situacao == SituacaoProcedimento.EM_ANDAMENTO || situacao == SituacaoProcedimento.CONCLUIDO)
+                    && dataHoraEfetiva == null)) {
+            throw new IllegalArgumentException("Situação e data efetiva da cirurgia são incompatíveis.");
+        }
+        procedimento.situacao = situacao;
+        procedimento.dataHoraEfetiva = dataHoraEfetiva;
+        return procedimento;
+    }
+
     public AreaAtuacaoCirurgica getTipoCirurgia() { return tipoCirurgia; }
     public String getDescricao() { return descricao; }
     public LocalDateTime getDataHoraPrevista() { return dataHoraPrevista; }

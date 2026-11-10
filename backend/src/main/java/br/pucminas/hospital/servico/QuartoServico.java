@@ -12,18 +12,24 @@ import br.pucminas.hospital.repositorio.QuartoRepositorio;
 public class QuartoServico {
 
     private final QuartoRepositorio repositorio;
+    private final br.pucminas.hospital.repositorio.InternacaoRepositorio internacoes;
 
-    public QuartoServico(QuartoRepositorio repositorio) {
+    public QuartoServico(QuartoRepositorio repositorio, br.pucminas.hospital.repositorio.InternacaoRepositorio internacoes) {
         this.repositorio = repositorio;
+        this.internacoes = internacoes;
     }
 
     public List<Quarto> listar() {
-        return repositorio.findAll();
+        List<Quarto> quartos = repositorio.findAll();
+        quartos.forEach(this::preencherOcupacao);
+        return quartos;
     }
 
     public Quarto buscarPorId(Integer numeroId) {
-        return repositorio.findById(numeroId)
+        Quarto quarto = repositorio.findById(numeroId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("quarto não encontrado: " + numeroId));
+        preencherOcupacao(quarto);
+        return quarto;
     }
 
     public Quarto criar(Quarto quarto) {
@@ -32,16 +38,25 @@ public class QuartoServico {
         return repositorio.save(quarto);
     }
 
+    @org.springframework.transaction.annotation.Transactional
     public Quarto atualizar(Integer numeroId, Quarto dados) {
-        Quarto quarto = buscarPorId(numeroId);
+        Quarto quarto = repositorio.buscarParaAtualizar(numeroId)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("quarto não encontrado: " + numeroId));
+        preencherOcupacao(quarto);
+        if (dados.getCapacidadeMax() == null || dados.getCapacidadeMax() < quarto.getOcupacaoAtual()) {
+            throw new IllegalStateException("Capacidade não pode ser menor que a ocupação atual.");
+        }
         quarto.setAndar(dados.getAndar());
         quarto.setCapacidadeMax(dados.getCapacidadeMax());
-        quarto.setDisponivel(dados.getDisponivel());
+        quarto.setDisponivel(dados.isHabilitado());
         return repositorio.save(quarto);
     }
 
     public void remover(Integer numeroId) {
         Quarto quarto = buscarPorId(numeroId);
         repositorio.delete(quarto);
+    }
+    private void preencherOcupacao(Quarto quarto) {
+        quarto.setOcupacaoAtual(internacoes.findByQuartoNumeroIdAndDataEfetivaAltaIsNull(quarto.getNumeroId()).size());
     }
 }

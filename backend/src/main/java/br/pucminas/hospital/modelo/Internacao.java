@@ -15,6 +15,9 @@ public class Internacao {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @jakarta.persistence.Version
+    private Long versao;
+
     @ManyToOne(optional = false)
     private Paciente paciente;
 

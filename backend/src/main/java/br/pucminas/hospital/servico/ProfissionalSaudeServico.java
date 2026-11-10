@@ -13,9 +13,11 @@ import br.pucminas.hospital.repositorio.ProfissionalSaudeRepositorio;
 public class ProfissionalSaudeServico {
 
     private final ProfissionalSaudeRepositorio repositorio;
+    private final ConversorDominio conversor;
 
-    public ProfissionalSaudeServico(ProfissionalSaudeRepositorio repositorio) {
+    public ProfissionalSaudeServico(ProfissionalSaudeRepositorio repositorio, ConversorDominio conversor) {
         this.repositorio = repositorio;
+        this.conversor = conversor;
     }
 
     public List<ProfissionalSaude> listar() {
@@ -48,6 +50,7 @@ public class ProfissionalSaudeServico {
         }
         profissional.setRegistro(reg);
 
+        conversor.profissional(profissional);
         return repositorio.save(profissional);
     }
 
@@ -66,6 +69,7 @@ public class ProfissionalSaudeServico {
         profissional.setNome(dados.getNome().trim());
         profissional.setTelefone(dados.getTelefone());
         profissional.setEmail(dados.getEmail());
+        conversor.profissional(profissional);
         return repositorio.save(profissional);
     }
 

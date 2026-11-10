@@ -16,4 +16,7 @@ public interface ProfissionalSaudeRepositorio extends JpaRepository<Profissional
     boolean existsByRegistroAndIdNot(String registro, Long id);
 
     List<ProfissionalSaude> findByEspecialidadeIgnoreCase(String especialidade);
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @org.springframework.data.jpa.repository.Query("select registro from ProfissionalSaude registro where registro.id = :id")
+    java.util.Optional<ProfissionalSaude> buscarParaAtualizar(@org.springframework.data.repository.query.Param("id") Long id);
 }

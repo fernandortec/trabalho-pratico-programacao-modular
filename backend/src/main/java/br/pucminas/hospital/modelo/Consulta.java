@@ -26,6 +26,20 @@ public class Consulta {
 
     private String motivo;
 
+    @jakarta.persistence.Enumerated(jakarta.persistence.EnumType.STRING)
+    private ENUMS.SituacaoConsulta situacao = ENUMS.SituacaoConsulta.AGENDADA;
+
+    @jakarta.persistence.Enumerated(jakarta.persistence.EnumType.STRING)
+    private ENUMS.AreaAtuacao area;
+
+    @jakarta.persistence.Version
+    private Long versao;
+
+    public ENUMS.SituacaoConsulta getSituacao() { return situacao; }
+    public void setSituacao(ENUMS.SituacaoConsulta situacao) { this.situacao = situacao; }
+    public ENUMS.AreaAtuacao getArea() { return area; }
+    public void setArea(ENUMS.AreaAtuacao area) { this.area = area; }
+
     public Long getId() {
         return id;
     }
