@@ -8,6 +8,17 @@
 
 ---
 
+## Estado da implementação
+
+Este catálogo reúne regras do projeto; não comprova que todas estejam disponíveis na API.
+As regras de categorias, modalidades, estados, cirurgia e ocupação estão implementadas
+no domínio `classes/`. Consulte [DOMINIO_SPRINT2.md](./DOMINIO_SPRINT2.md) para execução
+e contratos atualizados. A API mantém seu próprio cadastro de pacientes, profissionais e
+quartos; integração de atendimentos e internações ainda está pendente.
+
+Tipos de quartos não foram definidos nos PDFs e aguardam esclarecimento do professor.
+Não foram inventadas categorias adicionais.
+
 ## 1. Visão Geral do Domínio
 
 A Sprint 2 evolui o sistema hospitalar desenvolvido na Sprint 1, introduzindo maior robustez às classes de domínio, aplicando conceitos fundamentais de Orientação a Objetos (Encapsulamento, Herança, Polimorfismo e Invariantes de Classe) para garantir a consistência das informações clínicas e operacionais.
@@ -20,7 +31,7 @@ As principais frentes abordadas são:
 
 ---
 
-## 2. Catálogo Oficial de Regras de Negócio (RN)
+## 2. Catálogo de Regras de Negócio (RN)
 
 ### 2.1. Profissionais de Saúde e Especialidades
 
@@ -28,7 +39,7 @@ As principais frentes abordadas são:
 | :--- | :--- | :--- | :--- |
 | **RN-PROF-01** | **Obrigatoriedade e Unicidade do Registro** | Todo profissional de saúde deve possuir registro no conselho de classe (CRM) único, não nulo e não vazio. Nome, telefone e e-mail com formato válido também são obrigatórios. | Disparar `IllegalArgumentException` ou `RegistroDuplicadoException`. |
 | **RN-PROF-02** | **Atribuições do Médico Clínico Geral** | O médico clínico geral realiza consultas de rotina, avaliações iniciais e triagens gerais dos pacientes. É o único profissional que possui a responsabilidade de emitir formalmente encaminhamentos para médicos especialistas e deve registrar as informações referentes às consultas realizadas. | Impedir operações especializadas pelo perfil clínico geral. |
-| **RN-PROF-03** | **Área de Atuação Obrigatória para Especialista** | O médico especialista deve possuir uma especialidade médica registrada via enum `AreaAtuacao` (`CARDIOLOGIA`, `NEUROLOGIA`, `ORTOPEDIA`, etc.). O sistema deve permitir a consulta e filtragem dos profissionais disponíveis por especialidade. | Bloquear cadastro sem especialidade definida. |
+| **RN-PROF-03** | **Área de Atuação Obrigatória para Especialista** | O médico especialista deve possuir uma especialidade médica registrada via enum `AreaAtuacao` (`CARDIOLOGIA`, `NEUROLOGIA`, `ORTOPEDIA`, etc.). A API permite filtrar cadastros por especialidade, mas ainda não verifica agenda/disponibilidade nem usa a hierarquia do domínio. | Bloquear cadastro sem especialidade definida. |
 | **RN-PROF-04** | **Atribuição Cirúrgica e Procedimentos** | O médico cirurgião deve possuir sua especialidade cirúrgica registrada via enum `AreaAtuacaoCirurgica` (`CIRURGIA_GERAL`, `CIRURGIA_CARDIOVASCULAR`, `NEUROCIRURGIA`, etc.). É o único perfil profissional autorizado a atuar como cirurgião principal responsável por procedimentos cirúrgicos. | Disparar erro de profissional não autorizado para cirurgias. |
 
 ---
@@ -37,11 +48,11 @@ As principais frentes abordadas são:
 
 | Código | Nome da Regra | Descrição e Validação | Ação em Caso de Violação |
 | :--- | :--- | :--- | :--- |
-| **RN-ATD-01** | **Herança Comum e Validação Polimórfica** | Todas as modalidades de atendimento derivam de uma classe base comum (`Atendimento`), compartilhando atributos (`id`, `paciente`, `profissional`, `motivo`, `dataHora`, `observacoes`, `situacao`). Cada modalidade implementa seu próprio método `validarCondicoesAtendimento()`. | Impedir instanciação inconsistente no domínio. |
+| **RN-ATD-01** | **Herança Comum e Validação Polimórfica** | Todas as modalidades de atendimento derivam de uma classe base comum (`Atendimento`), compartilhando `id`, `paciente`, `profissional` e `observacoes`. `Consulta` acrescenta data, motivo e situação. Cada modalidade implementa `validarCondicoes()`. | Impedir instanciação inconsistente no domínio. |
 | **RN-ATD-02** | **Requisitos da Consulta de Rotina** | Exige data, horário, paciente cadastrado, médico responsável (clínico geral habilitado) e motivo do atendimento. O registro de observações clínicas finais é permitido apenas após o início ou realização da consulta. | Disparar erro de dados obrigatórios ausentes. |
-| **RN-ATD-03** | **Compatibilidade Estrita na Consulta Especializada** | A consulta especializada exige a indicação de uma `AreaAtuacao`. O profissional atribuído deve ser um `MedicoEspecialista` e a sua área de atuação deve ser **rigorosamente idêntica** à especialidade solicitada. | Disparar `EspecialidadeIncompativelException` (ex: cardiologista não pode atender consulta de ortopedia). |
+| **RN-ATD-03** | **Compatibilidade Estrita na Consulta Especializada** | A consulta especializada exige a indicação de uma `AreaAtuacao`. O profissional atribuído deve ser um `MedicoEspecialista` e a sua área de atuação deve ser **rigorosamente idêntica** à especialidade solicitada. | Disparar `IllegalArgumentException` (ex: cardiologista não pode atender consulta de ortopedia). |
 | **RN-ATD-04** | **Classificação de Prioridade na Emergência** | Todo atendimento de emergência exige triagem imediata com classificação de risco pré-definida via enum `PrioridadeAtendimento`: `BAIXA`, `MODERADA`, `ALTA` ou `CRITICA`. | Bloquear triagem sem nível de prioridade. |
-| **RN-ATD-05** | **Gestão da Fila de Emergência** | Atendimentos de emergência possuem ciclo próprio (`AGUARDANDO`, `EM_ATENDIMENTO`, `CONCLUIDO`), viabilizando a ordenação dos pacientes que ainda aguardam avaliação por grau de urgência. | Ordenação na fila por prioridade decrescente e hora de chegada. |
+| **RN-ATD-05** | **Gestão da Fila de Emergência** | Atendimentos de emergência possuem ciclo próprio (`AGUARDANDO`, `EM_ATENDIMENTO`, `CONCLUIDO`), viabilizando a ordenação dos pacientes que ainda aguardam avaliação por grau de urgência. | O domínio expõe prioridade, chegada e situação para consulta. Ordenação de uma fila é uma extensão documental, não exigida explicitamente no PDF e não implementada nesta etapa. |
 
 ---
 
@@ -60,7 +71,7 @@ As principais frentes abordadas são:
 
 | Código | Nome da Regra | Descrição e Validação | Ação em Caso de Violação |
 | :--- | :--- | :--- | :--- |
-| **RN-EST-01** | **Tipagem Consistente por Enum** | A situação da consulta deve ser controlada exclusivamente pelo tipo enumerado `SituacaoConsulta` (`AGENDADA`, `CONFIRMADA`, `EM_ATENDIMENTO`, `CONCLUIDA`, `CANCELADA`, `NAO_COMPARECEU`), evitando textos livres divergentes. | Erro de validação ou conversão no endpoint REST. |
+| **RN-EST-01** | **Tipagem Consistente por Enum** | A situação da consulta deve ser controlada exclusivamente pelo tipo enumerado `SituacaoConsulta` (`AGENDADA`, `CONFIRMADA`, `EM_ATENDIMENTO`, `CONCLUIDA`, `CANCELADA`, `NAO_COMPARECEU`), evitando textos livres divergentes. | Enum no domínio; endpoint de consultas ainda pendente. |
 | **RN-EST-02** | **Imutabilidade de Consulta Concluída** | Uma consulta em situação `CONCLUIDA` não poderá voltar a ser considerada agendada, confirmada ou em atendimento. Trata-se de um estado terminal e imutável. | Disparar `IllegalStateException`: Consulta já finalizada. |
 | **RN-EST-03** | **Imutabilidade de Consulta Cancelada** | Uma consulta em situação `CANCELADA` não poderá ser alterada para `CONCLUIDA` ou qualquer outro estado sem a realização de um novo agendamento. | Disparar `IllegalStateException`: Consulta cancelada não pode ser reaberta. |
 | **RN-EST-04** | **Matriz de Transições Válidas** | Permitidas apenas as seguintes transições:<br>• `AGENDADA` $\rightarrow$ `CONFIRMADA`, `EM_ATENDIMENTO`, `CANCELADA`, `NAO_COMPARECEU`.<br>• `CONFIRMADA` $\rightarrow$ `EM_ATENDIMENTO`, `CANCELADA`, `NAO_COMPARECEU`.<br>• `EM_ATENDIMENTO` $\rightarrow$ `CONCLUIDA`, `CANCELADA`. | Qualquer outra transição deve ser rejeitada com erro. |
@@ -71,8 +82,8 @@ As principais frentes abordadas são:
 
 | Código | Nome da Regra | Descrição e Validação | Ação em Caso de Violação |
 | :--- | :--- | :--- | :--- |
-| **RN-PAC-01** | **Integridade Cadastral do Paciente** | CPF obrigatório, único e válido; nome obrigatório; data de nascimento no passado ($dataNascimento \le hoje$). | Rejeitar persistência do paciente. |
-| **RN-QRT-01** | **Disponibilidade de Quarto na Internação** | Uma internação só pode ser realizada se o quarto selecionado possuir leito vago (capacidade máxima não atingida e status `disponivel == true`). | Disparar erro de quarto indisponível ou lotado. |
+| **RN-PAC-01** | **Integridade Cadastral do Paciente** | O cadastro da API valida CPF, nome e data de nascimento. Essa validação cadastral não foi transferida para `PESSOAS.Paciente` nesta etapa. | Rejeitar persistência do paciente. |
+| **RN-QRT-01** | **Disponibilidade de Quarto na Internação** | Uma internação só pode ser realizada se o quarto selecionado possuir leito vago (capacidade máxima não atingida; `isDisponivel()` é calculado pela ocupação). | Disparar erro de quarto indisponível ou lotado. |
 | **RN-QRT-02** | **Liberação de Vaga na Alta Hospitalar** | Ao registrar a `dataEfetivaAlta` da internação, a vaga do quarto é imediatamente liberada, atualizando a disponibilidade do leito. | Atualização automática do estado do quarto. |
 | **RN-QRT-03** | **Coerência Temporal de Internação** | A data prevista de alta deve ser posterior ou igual à data de entrada. A data efetiva de alta não pode ser anterior à data de entrada. | Disparar erro de intervalo de datas inválido. |
 
@@ -141,96 +152,17 @@ stateDiagram-v2
 
 ---
 
-## 4. Arquitetura Orientada a Objetos das Regras de Negócio
+## 4. Contratos da implementação
 
-### 4.1. Polimorfismo e Invariantes na Classe Base `Atendimento`
-A classe base `Atendimento` concentra os atributos comuns e métodos de transição com proteções de estado:
+Os exemplos executáveis estão em `classes/Main.java` e os testes em
+`classes/src/test/java/dominio/DominioTest.java`. As assinaturas antigas que recebiam
+situação, data efetiva ou listas de observações foram removidas dos construtores de
+atendimentos e internações. Os estados iniciais são definidos internamente.
 
-```java
-public abstract class Atendimento {
-    private String id;
-    private Paciente paciente;
-    private Profissional profissional;
-    private String motivo;
-    private LocalDateTime dataHora;
-    private SituacaoConsulta situacao;
-    private List<Observacoes> observacoes = new ArrayList<>();
+- `IllegalArgumentException`: dados obrigatórios ausentes, especialidade incompatível ou datas inválidas.
+- `IllegalStateException`: transição incompatível, quarto lotado ou operação após alta.
+- Operações rejeitadas não alteram estado, ocupação ou histórico.
+- CRM único e filtro por especialidade continuam no cadastro do backend; não há registro estático global no domínio.
+- O backend ainda precisa traduzir as exceções do domínio e usar essas classes antes de anunciar as regras como disponíveis na API.
 
-    public Atendimento(...) {
-        // Inicialização com estado AGENDADA
-        this.situacao = SituacaoConsulta.AGENDADA;
-    }
-
-    // Contrato polimórfico obrigatório para as subclasses
-    public abstract void validarCondicoesAtendimento();
-
-    // Métodos de guarda para garantir a máquina de estados
-    public void confirmar() {
-        if (this.situacao != SituacaoConsulta.AGENDADA) {
-            throw new IllegalStateException("Apenas consultas agendadas podem ser confirmadas.");
-        }
-        this.situacao = SituacaoConsulta.CONFIRMADA;
-    }
-
-    public void iniciarAtendimento() {
-        if (this.situacao != SituacaoConsulta.AGENDADA && this.situacao != SituacaoConsulta.CONFIRMADA) {
-            throw new IllegalStateException("A consulta só pode ser iniciada se estiver agendada ou confirmada.");
-        }
-        this.situacao = SituacaoConsulta.EM_ATENDIMENTO;
-    }
-
-    public void concluir() {
-        if (this.situacao != SituacaoConsulta.EM_ATENDIMENTO) {
-            throw new IllegalStateException("Apenas consultas em atendimento podem ser concluídas (RN-EST-04).");
-        }
-        this.situacao = SituacaoConsulta.CONCLUIDA;
-    }
-
-    public void cancelar() {
-        if (this.situacao == SituacaoConsulta.CONCLUIDA) {
-            throw new IllegalStateException("Uma consulta concluída não pode ser cancelada (RN-EST-02).");
-        }
-        this.situacao = SituacaoConsulta.CANCELADA;
-    }
-}
-```
-
-### 4.2. Validação Específica em `AtendimentoEspecializado`
-```java
-@Override
-public void validarCondicoesAtendimento() {
-    if (this.area == null) {
-        throw new IllegalArgumentException("Área de atuação requerida não informada.");
-    }
-    if (!(getProfissional() instanceof MedicoEspecialista especialista)) {
-        throw new IllegalArgumentException("Profissional selecionado não é um especialista.");
-    }
-    if (especialista.getArea() != this.area) {
-        throw new IllegalArgumentException(
-            "Especialidade do médico (" + especialista.getArea() + 
-            ") não confere com a consulta solicitada (" + this.area + ") - RN-ATD-03."
-        );
-    }
-}
-```
-
-### 4.3. Validação Específica em `ProcedimentoCirurgico`
-```java
-@Override
-public void validarCondicoesAtendimento() {
-    if (!(getProfissional() instanceof MedicoCirurgiao cirurgiao)) {
-        throw new IllegalArgumentException("O profissional deve ser um cirurgião habilitado (RN-CIR-01).");
-    }
-    if (cirurgiao.getAreaCirurgica() != this.tipoCirurgia) {
-        throw new IllegalArgumentException("Área cirúrgica do profissional incompatível com o tipo de cirurgia.");
-    }
-}
-
-public void concluirCirurgia() {
-    // RN-CIR-04: Não será permitido registrar como concluído se não tiver sido iniciado
-    if (this.situacaoCirurgica != SituacaoProcedimento.EM_ANDAMENTO) {
-        throw new IllegalStateException("O procedimento cirúrgico só pode ser CONCLUÍDO se estiver EM_ANDAMENTO.");
-    }
-    this.situacaoCirurgica = SituacaoProcedimento.CONCLUIDO;
-}
-```
+O guia [DOMINIO_SPRINT2.md](./DOMINIO_SPRINT2.md) detalha os contratos para essa integração.

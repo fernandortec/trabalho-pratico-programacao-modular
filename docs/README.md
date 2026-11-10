@@ -7,6 +7,21 @@
 
 ---
 
+## Estado verificado da entrega
+
+As regras do domínio Java foram implementadas em `classes/`, com um projeto Maven
+independente e testes JUnit 5. O guia [Domínio da Sprint 2](./DOMINIO_SPRINT2.md)
+descreve o escopo, as interfaces e a validação.
+
+A API Spring Boot ainda usa modelos próprios e não executa esse domínio. Estão
+implementados os endpoints de pacientes, profissionais e quartos. Consultas e
+internações na API são pendências de integração. O frontend usa `localStorage`
+para demonstração e não consome a API.
+
+**Tipos de quartos:** os PDFs não definem categorias ou restrições por tipo;
+essa definição precisa ser esclarecida com o professor. O domínio implementa
+capacidade, ocupação, disponibilidade e liberação de vaga na alta.
+
 ## 📌 Sumário
 
 1. [Sobre o Projeto](#-sobre-o-projeto)
@@ -23,7 +38,7 @@
 
 ## 📖 Sobre o Projeto
 
-O **Sistema Hospitalar** é uma aplicação completa voltada para a gestão de atendimentos clínicos, procedimentos cirúrgicos, internações e profissionais de saúde. O projeto aplica os pilares fundamentais da **Engenharia de Software** e da **Programação Modular/Orientada a Objetos**:
+O **Sistema Hospitalar** é uma aplicação em desenvolvimento voltada para a gestão de atendimentos clínicos, procedimentos cirúrgicos, internações e profissionais de saúde. O projeto aplica os pilares fundamentais da **Engenharia de Software** e da **Programação Modular/Orientada a Objetos**:
 - **Encapsulamento e Invariantes:** Manutenção de estado consistente através de métodos de guarda e ausência de transições ilegais.
 - **Herança e Especialização:** Extensão de responsabilidades para profissionais e modalidades de atendimento.
 - **Polimorfismo:** Verificação e validação de regras de atendimento delegadas a cada modalidade específica.
@@ -66,11 +81,11 @@ trabalho-pratico-programacao-modular/
 ### 1. Categorias de Profissionais de Saúde
 * **Profissional (Superclasse):** Contém registro profissional único (CRM), nome, telefone e e-mail.
 * **Médico Clínico Geral:** Realiza consultas de rotina, avaliações iniciais e pode encaminhar pacientes para especialistas.
-* **Médico Especialista:** Possui uma `AreaAtuacao` associada (`CARDIOLOGIA`, `NEUROLOGIA`, `ORTOPEDIA`). O sistema permite consultar profissionais por especialidade.
+* **Médico Especialista:** Possui uma `AreaAtuacao` associada (`CARDIOLOGIA`, `NEUROLOGIA`, `ORTOPEDIA`). A API permite filtrar os cadastros por especialidade; esse cadastro ainda não está integrado à hierarquia do domínio.
 * **Médico Cirurgião:** Possui uma `AreaAtuacaoCirurgica` (`CIRURGIA_GERAL`, `CIRURGIA_CARDIOVASCULAR`, `NEUROCIRURGIA`). É o único profissional habilitado a ser o cirurgião responsável por procedimentos cirúrgicos.
 
 ### 2. Modalidades de Atendimento (Polimorfismo)
-* **Atendimento (Superclasse Abstrata):** Reúne atributos comuns (`id`, `paciente`, `profissional`, `motivo`, `dataHora`, `observacoes`, `situacao`) e declara o método abstrato `validarCondicoesAtendimento()`.
+* **Atendimento (Superclasse Abstrata):** Reúne atributos comuns (`id`, `paciente`, `profissional`, `observacoes`); `Consulta` concentra `motivo`, `dataHora` e `situacao` e declara o método abstrato `validarCondicoes()`.
 * **Consulta de Rotina:** Destinada à avaliação geral do paciente; realizada por Clínico Geral.
 * **Consulta Especializada:** **Exige compatibilidade rigorosa** entre a área da consulta solicitada e a especialidade do médico alocado. Médicos com especialidade divergente são rejeitados.
 * **Atendimento de Emergência:** Possui prioridade de risco obrigatória (`BAIXA`, `MODERADA`, `ALTA`, `CRITICA`) e controle de fila (`AGUARDANDO`, `EM_ATENDIMENTO`, `CONCLUIDO`).
@@ -126,7 +141,7 @@ stateDiagram-v2
 
 ## 🌐 Endpoints da API REST
 
-A API Spring Boot disponibiliza os endpoints abaixo para gerenciamento do hospital:
+A API Spring Boot disponibiliza os endpoints de pacientes, profissionais e quartos abaixo. As linhas marcadas como **pendente** descrevem a integração futura:
 
 | Método | Endpoint | Descrição |
 | :--- | :--- | :--- |
@@ -134,10 +149,10 @@ A API Spring Boot disponibiliza os endpoints abaixo para gerenciamento do hospit
 | `GET / PUT / DELETE` | `/pacientes/{id}` | Busca, atualização e remoção de paciente por ID |
 | `GET / POST` | `/profissionais` | Listagem e cadastro de profissionais com especialidades e CRM |
 | `GET / PUT / DELETE` | `/profissionais/{id}` | Busca, atualização e remoção de profissional de saúde |
-| `GET / POST` | `/consultas` | Listagem e agendamento de consultas de rotina e especializadas |
-| `PATCH` | `/consultas/{id}/situacao` | Transição controlada de situação (confirmar, iniciar, concluir, cancelar) |
-| `GET / POST` | `/internacoes` | Gestão de internações hospitalares e alocação de leitos |
-| `PATCH` | `/internacoes/{id}/alta` | Registro de alta médica com liberação automática do quarto |
+| `GET / POST` | `/consultas` **(pendente)** | Listagem e agendamento de consultas de rotina e especializadas |
+| `PATCH` | `/consultas/{id}/situacao` **(pendente)** | Transição controlada de situação (confirmar, iniciar, concluir, cancelar) |
+| `GET / POST` | `/internacoes` **(pendente)** | Gestão de internações hospitalares e alocação de leitos |
+| `PATCH` | `/internacoes/{id}/alta` **(pendente)** | Registro de alta médica com liberação automática do quarto |
 | `GET / POST` | `/quartos` | Listagem de quartos e controle de disponibilidade e capacidade |
 
 ---
@@ -145,8 +160,8 @@ A API Spring Boot disponibiliza os endpoints abaixo para gerenciamento do hospit
 ## 🚀 Como Executar
 
 ### Pré-requisitos
-- **Java JDK 21+** (ou 25) instalado e configurado no `PATH`
-- **Maven 3.8+** (ou o wrapper incluído)
+- **Java JDK 25** instalado e configurado no `PATH`
+- **Maven 3.9+** (não há wrapper incluído)
 - **Node.js 18+** e **npm**
 
 ---
@@ -179,75 +194,33 @@ npm run dev
 ```
 
 A interface web estará disponível em:  
-👉 `http://localhost:5173`
+👉 `http://localhost:3000`
 
 ---
 
 ### 3. Compilando as Classes de Domínio Puras (Sem Spring)
 
-Se desejar testar a modelagem orientada a objetos isoladamente:
+Na raiz do repositório, execute:
 
-```powershell
-javac (Get-ChildItem -Recurse classes\*.java | Select-Object -ExpandProperty FullName)
-java -cp classes Main
+```sh
+mvn -f classes/pom.xml test
+java -cp classes/target/classes Main
 ```
+
+O Maven compila as pastas Java atuais e executa os testes em
+`classes/src/test/java`. Não é necessário iniciar o Spring Boot ou um banco de dados.
 
 ---
 
 ## 📂 Estrutura de Pastas
 
-```
-trabalho-pratico-programacao-modular-master/
-│
-├── README.md                          # Este documento principal
-├── REGRAS_DE_NEGOCIO.md               # Catálogo completo e detalhado das Regras de Negócio
-├── diagrama-classes.drawio            # Diagrama de Classes da Sprint 1 (draw.io)
-├── TrabalhoPMAndamento.drawio         # Diagrama de Classes atualizado da Sprint 2
-├── Cartoes_CRC_SistemaHospital.pdf    # Cartões Classe-Responsabilidade-Colaborador (CRC)
-│
-├── backend/                           # API REST Spring Boot
-│   ├── pom.xml
-│   └── src/main/java/br/pucminas/hospital/
-│       ├── HospitalApplication.java
-│       ├── controle/                  # Controllers REST
-│       ├── modelo/                    # Entidades JPA e regras
-│       ├── repositorio/               # Repositórios Spring Data
-│       └── servico/                   # Camada de serviços e regras de negócio
-│
-├── frontend/                          # Interface Web (React + TS + Vite)
-│   ├── package.json
-│   ├── vite.config.ts
-│   └── src/
-│       ├── routes/                    # Páginas e rotas de navegação
-│       └── styles.css
-│
-└── classes/                           # Classes puras de domínio OO (Programação Modular)
-    ├── Main.java
-    ├── Atendimento/                   # Hierarquia de atendimentos e consultas
-    │   ├── Atendimento.java
-    │   ├── AtendimentoEmergencia.java
-    │   ├── AtendimentoEspecializado.java
-    │   ├── Observacoes.java
-    │   └── ProcedimentoCirurgico.java
-    ├── ENUMS/                         # Tipos enumerados
-    │   ├── AreaAtuacao.java
-    │   ├── AreaAtuacaoCirurgica.java
-    │   ├── PrioridadeAtendimento.java
-    │   ├── SituacaoConsulta.java
-    │   ├── SituacaoEmergencia.java
-    │   └── SituacaoProcedimento.java
-    └── PESSOAS/                       # Hierarquia de profissionais e pacientes
-        ├── Paciente.java
-        ├── Profissional.java
-        ├── MedicoClinicoGeral.java
-        ├── MedicoEspecialista.java
-        └── MedicoCirurgiao.java
-```
-
----
+- `classes/`: domínio Java, demonstração `Main`, `pom.xml` e testes em `src/test/java`.
+- `backend/`: API Spring Boot, modelos JPA próprios e testes de pacientes/profissionais.
+- `frontend/`: interface React com dados locais de demonstração.
+- `docs/`: documentação e diagrama da Sprint 2.
 
 ## 📚 Documentos de Apoio
 
-- [Catálogo Oficial de Regras de Negócio (REGRAS_DE_NEGOCIO.md)](./REGRAS_DE_NEGOCIO.md)
-- [Diagrama de Classes Sprint 2 (TrabalhoPMAndamento.drawio)](./TrabalhoPMAndamento.drawio)
-- [Cartões CRC (Cartoes_CRC_SistemaHospital.pdf)](./Cartoes_CRC_SistemaHospital.pdf)
+- [Regras de negócio e limites da integração](./REGRAS_DE_NEGOCIO.md)
+- [Guia de implementação do domínio](./DOMINIO_SPRINT2.md)
+- [Diagrama da Sprint 2](./Diagrama%20Sprint%202.pdf)
