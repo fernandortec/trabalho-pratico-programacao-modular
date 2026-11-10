@@ -5,112 +5,98 @@ import PESSOAS.MedicoCirurgiao;
 import PESSOAS.Profissional;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.time.LocalDateTime;
+import ENUMS.AreaAtuacaoCirurgica;
 import ENUMS.SituacaoProcedimento;
 
 public class ProcedimentoCirurgico extends Atendimento {
-    private String tipoCirurgia;
-    private String descricao;
-    private LocalDateTime dataHoraPrevista;
+    private final AreaAtuacaoCirurgica tipoCirurgia;
+    private final String descricao;
+    private final LocalDateTime dataHoraPrevista;
     private LocalDateTime dataHoraEfetiva;
-    private SituacaoProcedimento situacao;
-    private List<Observacao> observacoesPre;
-    private List<Observacao> observacoesPos;
+    private SituacaoProcedimento situacao = SituacaoProcedimento.AGENDADO;
+    private final List<Observacao> observacoesPre = new ArrayList<>();
+    private final List<Observacao> observacoesPos = new ArrayList<>();
 
     public ProcedimentoCirurgico(String id, Paciente paciente, Profissional profissional,
-            List<Observacao> observacoes, String tipoCirurgia, String descricao,
-            LocalDateTime dataHoraPrevista, LocalDateTime dataHoraEfetiva, SituacaoProcedimento situacao,
-            List<Observacao> observacoesPre, List<Observacao> observacoesPos) {
-        super(id, paciente, profissional, observacoes);
+            AreaAtuacaoCirurgica tipoCirurgia, String descricao, LocalDateTime dataHoraPrevista) {
+        super(id, paciente, profissional);
         this.tipoCirurgia = tipoCirurgia;
-        this.descricao = descricao;
+        if (descricao == null || descricao.isBlank() || dataHoraPrevista == null
+                || tipoCirurgia == null || !(profissional instanceof MedicoCirurgiao cirurgiao)
+                || cirurgiao.getAreaCirurgia() != tipoCirurgia) {
+            throw new IllegalArgumentException("Cirurgia exige descrição, data prevista e cirurgião da área solicitada.");
+        }
+        this.descricao = descricao.trim();
         this.dataHoraPrevista = dataHoraPrevista;
-        this.dataHoraEfetiva = dataHoraEfetiva;
-        this.situacao = situacao;
-        this.observacoesPre = observacoesPre == null ? new ArrayList<>() : new ArrayList<>(observacoesPre);
-        this.observacoesPos = observacoesPos == null ? new ArrayList<>() : new ArrayList<>(observacoesPos);
     }
 
-    public SituacaoProcedimento getSituacao() {
-        return this.situacao;
-    }
+    public AreaAtuacaoCirurgica getTipoCirurgia() { return tipoCirurgia; }
+    public String getDescricao() { return descricao; }
+    public LocalDateTime getDataHoraPrevista() { return dataHoraPrevista; }
+    public LocalDateTime getDataHoraEfetiva() { return dataHoraEfetiva; }
+    public SituacaoProcedimento getSituacao() { return situacao; }
+    public List<Observacao> getObservacoesPre() { return List.copyOf(observacoesPre); }
+    public List<Observacao> getObservacoesPos() { return List.copyOf(observacoesPos); }
 
-    public LocalDateTime getDataHoraEfetiva() {
-        return this.dataHoraEfetiva;
-    }
-
+    @Override
     public boolean validarCondicoes() {
-        if (getPaciente() == null || this.dataHoraPrevista == null
-                || this.descricao == null || this.descricao.isBlank()
-                || this.tipoCirurgia == null || this.tipoCirurgia.isBlank()) {
-            return false;
-        }
-        if (!(getProfissional() instanceof MedicoCirurgiao)) {
-            return false;
-        }
-        MedicoCirurgiao cirurgiao = (MedicoCirurgiao) getProfissional();
-        return this.tipoCirurgia.equals(cirurgiao.getAreaCirurgia());
+        return getProfissional() instanceof MedicoCirurgiao cirurgiao
+                && cirurgiao.getAreaCirurgia() == tipoCirurgia;
     }
 
     public void iniciar() {
-        if (this.situacao == SituacaoProcedimento.AGENDADO
-                && this.dataHoraEfetiva == null && validarCondicoes()) {
-            this.dataHoraEfetiva = LocalDateTime.now();
-            this.situacao = SituacaoProcedimento.EM_ANDAMENTO;
-            registrarNoHistorico();
+        if (situacao != SituacaoProcedimento.AGENDADO) {
+            throw new IllegalStateException("Somente cirurgia agendada pode ser iniciada.");
         }
+        if (!validarCondicoes()) {
+            throw new IllegalArgumentException("Condições da cirurgia inválidas.");
+        }
+        dataHoraEfetiva = LocalDateTime.now();
+        situacao = SituacaoProcedimento.EM_ANDAMENTO;
+        registrarNoHistorico();
     }
 
     public void concluir() {
-        if (this.situacao == SituacaoProcedimento.EM_ANDAMENTO
-                && this.dataHoraEfetiva != null) {
-            this.situacao = SituacaoProcedimento.CONCLUIDO;
+        if (situacao != SituacaoProcedimento.EM_ANDAMENTO || dataHoraEfetiva == null) {
+            throw new IllegalStateException("Somente cirurgia previamente iniciada pode ser concluída.");
         }
+        situacao = SituacaoProcedimento.CONCLUIDO;
     }
 
-public void cancelar() {
-        if (this.situacao == SituacaoProcedimento.AGENDADO
-                || this.situacao == SituacaoProcedimento.EM_ANDAMENTO) {
-            this.situacao = SituacaoProcedimento.CANCELADO;
+    public void cancelar() {
+        if (situacao != SituacaoProcedimento.AGENDADO && situacao != SituacaoProcedimento.EM_ANDAMENTO) {
+            throw new IllegalStateException("Cirurgia finalizada não pode ser cancelada.");
         }
-    }
-
-    public List<Observacao> getObservacoesPre() {
-        return Collections.unmodifiableList(new ArrayList<>(this.observacoesPre));
-    }
-
-    public List<Observacao> getObservacoesPos() {
-        return Collections.unmodifiableList(new ArrayList<>(this.observacoesPos));
+        situacao = SituacaoProcedimento.CANCELADO;
     }
 
     public Observacao registrarObservacaoPre(Profissional autor, String texto) {
-        if (this.situacao != SituacaoProcedimento.AGENDADO) {
-            return null;
+        if (situacao != SituacaoProcedimento.AGENDADO) {
+            throw new IllegalStateException("Observação pré-operatória exige cirurgia agendada.");
         }
         Observacao observacao = registrarObservacaoNaFase(autor, texto, "PRE_OPERATORIA");
-        if (observacao != null) {
-            this.observacoesPre.add(observacao);
-        }
+        observacoesPre.add(observacao);
         return observacao;
     }
 
     public Observacao registrarObservacaoPos(Profissional autor, String texto) {
-        if (this.situacao != SituacaoProcedimento.EM_ANDAMENTO
-                && this.situacao != SituacaoProcedimento.CONCLUIDO) {
-            return null;
+        if (!podeRegistrarObservacao()) {
+            throw new IllegalStateException("Observação pós-operatória exige cirurgia iniciada ou concluída.");
         }
         Observacao observacao = registrarObservacaoNaFase(autor, texto, "POS_OPERATORIA");
-        if (observacao != null) {
-            this.observacoesPos.add(observacao);
-        }
+        observacoesPos.add(observacao);
         return observacao;
     }
 
+    @Override
+    protected boolean podeRegistrarObservacao() {
+        return situacao == SituacaoProcedimento.EM_ANDAMENTO || situacao == SituacaoProcedimento.CONCLUIDO;
+    }
+
+    @Override
     public Observacao registrarObservacao(Profissional autor, String texto) {
-        if (this.situacao == SituacaoProcedimento.AGENDADO) {
-            return registrarObservacaoPre(autor, texto);
-        }
-        return registrarObservacaoPos(autor, texto);
+        return situacao == SituacaoProcedimento.AGENDADO
+                ? registrarObservacaoPre(autor, texto) : registrarObservacaoPos(autor, texto);
     }
 }

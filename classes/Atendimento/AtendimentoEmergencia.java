@@ -2,51 +2,55 @@ package Atendimento;
 
 import PESSOAS.Paciente;
 import PESSOAS.Profissional;
-import java.util.List;
 import java.time.LocalDateTime;
 import ENUMS.PrioridadeAtendimento;
 import ENUMS.SituacaoEmergencia;
 
 public class AtendimentoEmergencia extends Atendimento {
-    private LocalDateTime dataHoraChegada;
-    private PrioridadeAtendimento prioridade;
-    private SituacaoEmergencia situacao;
+    private final LocalDateTime dataHoraChegada;
+    private final PrioridadeAtendimento prioridade;
+    private SituacaoEmergencia situacao = SituacaoEmergencia.AGUARDANDO;
 
     public AtendimentoEmergencia(String id, Paciente paciente, Profissional profissional,
-            List<Observacao> observacoes, LocalDateTime dataHoraChegada, PrioridadeAtendimento prioridade,
-            SituacaoEmergencia situacao) {
-        super(id, paciente, profissional, observacoes);
+            LocalDateTime dataHoraChegada, PrioridadeAtendimento prioridade) {
+        super(id, paciente, profissional);
+        if (dataHoraChegada == null || prioridade == null) {
+            throw new IllegalArgumentException("Chegada e prioridade são obrigatórias.");
+        }
         this.dataHoraChegada = dataHoraChegada;
         this.prioridade = prioridade;
-        this.situacao = situacao;
     }
 
-    public SituacaoEmergencia getSituacao() {
-        return this.situacao;
-    }
+    public LocalDateTime getDataHoraChegada() { return dataHoraChegada; }
+    public PrioridadeAtendimento getPrioridade() { return prioridade; }
+    public SituacaoEmergencia getSituacao() { return situacao; }
 
+    @Override
     public boolean validarCondicoes() {
-        return getPaciente() != null
-                && getProfissional() != null
-                && this.dataHoraChegada != null
-                && this.prioridade != null;
+        return getPaciente() != null && getProfissional() != null
+                && dataHoraChegada != null && prioridade != null;
     }
 
     public void iniciarAvaliacao() {
-        if (this.situacao == SituacaoEmergencia.AGUARDANDO && validarCondicoes()) {
-            this.situacao = SituacaoEmergencia.EM_ATENDIMENTO;
-            registrarNoHistorico();
+        if (situacao != SituacaoEmergencia.AGUARDANDO) {
+            throw new IllegalStateException("Somente emergência aguardando pode ser iniciada.");
         }
+        if (!validarCondicoes()) {
+            throw new IllegalArgumentException("Condições da emergência inválidas.");
+        }
+        situacao = SituacaoEmergencia.EM_ATENDIMENTO;
+        registrarNoHistorico();
     }
 
     public void concluirAvaliacao() {
-        if (this.situacao == SituacaoEmergencia.EM_ATENDIMENTO) {
-            this.situacao = SituacaoEmergencia.CONCLUIDO;
+        if (situacao != SituacaoEmergencia.EM_ATENDIMENTO) {
+            throw new IllegalStateException("Somente emergência em atendimento pode ser concluída.");
         }
+        situacao = SituacaoEmergencia.CONCLUIDO;
     }
 
-protected boolean podeRegistrarObservacao() {
-        return this.situacao == SituacaoEmergencia.EM_ATENDIMENTO
-                || this.situacao == SituacaoEmergencia.CONCLUIDO;
+    @Override
+    protected boolean podeRegistrarObservacao() {
+        return situacao == SituacaoEmergencia.EM_ATENDIMENTO || situacao == SituacaoEmergencia.CONCLUIDO;
     }
 }

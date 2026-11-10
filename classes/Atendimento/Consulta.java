@@ -2,82 +2,61 @@ package Atendimento;
 
 import PESSOAS.Paciente;
 import PESSOAS.Profissional;
-import java.util.List;
 import java.time.LocalDateTime;
 import ENUMS.SituacaoConsulta;
 
 public abstract class Consulta extends Atendimento {
-    private LocalDateTime dataHora;
-    private String motivo;
-    private SituacaoConsulta situacao;
+    private final LocalDateTime dataHora;
+    private final String motivo;
+    private SituacaoConsulta situacao = SituacaoConsulta.AGENDADA;
 
-    public Consulta(String id, Paciente paciente, Profissional profissional,
-            List<Observacao> observacoes, LocalDateTime dataHora, String motivo,
-            SituacaoConsulta situacao) {
-        super(id, paciente, profissional, observacoes);
+    protected Consulta(String id, Paciente paciente, Profissional profissional,
+            LocalDateTime dataHora, String motivo) {
+        super(id, paciente, profissional);
+        if (dataHora == null || motivo == null || motivo.isBlank()) {
+            throw new IllegalArgumentException("Data, horário e motivo são obrigatórios.");
+        }
         this.dataHora = dataHora;
-        this.motivo = motivo;
-        this.situacao = situacao;
+        this.motivo = motivo.trim();
     }
 
-    public LocalDateTime getDataHora() {
-        return this.dataHora;
-    }
+    public LocalDateTime getDataHora() { return dataHora; }
+    public String getMotivo() { return motivo; }
+    public SituacaoConsulta getSituacao() { return situacao; }
 
-    public String getMotivo() {
-        return this.motivo;
-    }
-
-    public SituacaoConsulta getSituacao() {
-        return this.situacao;
-    }
-
-    protected boolean validarDadosConsulta() {
-        return getPaciente() != null
-                && getProfissional() != null
-                && this.dataHora != null
-                && this.motivo != null
-                && !this.motivo.isBlank();
-    }
-
-    public void confirmar() {
-        if (this.situacao == SituacaoConsulta.AGENDADA) {
-            this.situacao = SituacaoConsulta.CONFIRMADA;
-        }
-    }
-
+    public void confirmar() { transicionar(SituacaoConsulta.CONFIRMADA); }
     public void iniciar() {
-        if ((this.situacao == SituacaoConsulta.AGENDADA
-                || this.situacao == SituacaoConsulta.CONFIRMADA)
-                && validarCondicoes()) {
-            this.situacao = SituacaoConsulta.EM_ATENDIMENTO;
-            registrarNoHistorico();
+        if (!validarCondicoes()) {
+            throw new IllegalArgumentException("Condições da consulta inválidas.");
         }
+        transicionar(SituacaoConsulta.EM_ATENDIMENTO);
+        registrarNoHistorico();
+    }
+    public void concluir() { transicionar(SituacaoConsulta.CONCLUIDA); }
+    public void cancelar() { transicionar(SituacaoConsulta.CANCELADA); }
+    public void registrarAusencia() { transicionar(SituacaoConsulta.NAO_COMPARECEU); }
+
+    private void transicionar(SituacaoConsulta destino) {
+        boolean permitida = switch (situacao) {
+            case AGENDADA -> destino == SituacaoConsulta.CONFIRMADA
+                    || destino == SituacaoConsulta.EM_ATENDIMENTO
+                    || destino == SituacaoConsulta.CANCELADA
+                    || destino == SituacaoConsulta.NAO_COMPARECEU;
+            case CONFIRMADA -> destino == SituacaoConsulta.EM_ATENDIMENTO
+                    || destino == SituacaoConsulta.CANCELADA
+                    || destino == SituacaoConsulta.NAO_COMPARECEU;
+            case EM_ATENDIMENTO -> destino == SituacaoConsulta.CONCLUIDA
+                    || destino == SituacaoConsulta.CANCELADA;
+            default -> false;
+        };
+        if (!permitida) {
+            throw new IllegalStateException("Transição inválida: " + situacao + " -> " + destino);
+        }
+        situacao = destino;
     }
 
-    public void concluir() {
-        if (this.situacao == SituacaoConsulta.EM_ATENDIMENTO) {
-            this.situacao = SituacaoConsulta.CONCLUIDA;
-        }
-    }
-
-    public void cancelar() {
-        if (this.situacao == SituacaoConsulta.AGENDADA
-                || this.situacao == SituacaoConsulta.CONFIRMADA
-                || this.situacao == SituacaoConsulta.EM_ATENDIMENTO) {
-            this.situacao = SituacaoConsulta.CANCELADA;
-        }
-    }
-
-    public void registrarAusencia() {
-        if (this.situacao == SituacaoConsulta.AGENDADA
-                || this.situacao == SituacaoConsulta.CONFIRMADA) {
-            this.situacao = SituacaoConsulta.NAO_COMPARECEU;
-        }
-    }
-
-protected boolean podeRegistrarObservacao() {
-        return this.situacao == SituacaoConsulta.EM_ATENDIMENTO
-                || this.situacao == SituacaoConsulta.CONCLUIDA;
+    @Override
+    protected boolean podeRegistrarObservacao() {
+        return situacao == SituacaoConsulta.EM_ATENDIMENTO || situacao == SituacaoConsulta.CONCLUIDA;
     }
 }

@@ -3,28 +3,26 @@ package Atendimento;
 import PESSOAS.Paciente;
 import PESSOAS.MedicoEspecialista;
 import PESSOAS.Profissional;
-import java.util.List;
 import java.time.LocalDateTime;
-import ENUMS.SituacaoConsulta;
+import ENUMS.AreaAtuacao;
 
 public class ConsultaEspecializada extends Consulta {
-    private String area;
+    private final AreaAtuacao area;
 
     public ConsultaEspecializada(String id, Paciente paciente, Profissional profissional,
-            List<Observacao> observacoes, LocalDateTime dataHora, String motivo,
-            SituacaoConsulta situacao, String area) {
-        super(id, paciente, profissional, observacoes, dataHora, motivo, situacao);
+            LocalDateTime dataHora, String motivo, AreaAtuacao area) {
+        super(id, paciente, profissional, dataHora, motivo);
         this.area = area;
+        if (area == null || !(profissional instanceof MedicoEspecialista especialista)
+                || especialista.getArea() != area) {
+            throw new IllegalArgumentException("A consulta exige especialista da área solicitada.");
+        }
     }
 
+    public AreaAtuacao getArea() { return area; }
+
+    @Override
     public boolean validarCondicoes() {
-        if (!validarDadosConsulta() || this.area == null || this.area.isBlank()) {
-            return false;
-        }
-        if (!(getProfissional() instanceof MedicoEspecialista)) {
-            return false;
-        }
-        MedicoEspecialista especialista = (MedicoEspecialista) getProfissional();
-        return this.area.equals(especialista.getArea());
+        return getProfissional() instanceof MedicoEspecialista especialista && especialista.getArea() == area;
     }
 }

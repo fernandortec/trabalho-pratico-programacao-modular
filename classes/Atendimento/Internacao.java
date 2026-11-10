@@ -3,76 +3,72 @@ package Atendimento;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.UUID;
 import PESSOAS.Paciente;
 import PESSOAS.Profissional;
 
 public class Internacao {
-    private String id;
-    private boolean ativa;
-    private LocalDateTime dataEntrada;
-    private LocalDateTime dataPrevistaAlta;
+    private final String id;
+    private final LocalDateTime dataEntrada;
+    private final LocalDateTime dataPrevistaAlta;
     private LocalDateTime dataEfetivaAlta;
-    private Paciente paciente;
-    private Profissional responsavel;
-    private Quarto quarto;
-    private List<Observacao> observacoes;
+    private final Paciente paciente;
+    private final Profissional responsavel;
+    private final Quarto quarto;
+    private final List<Observacao> observacoes = new ArrayList<>();
 
     public Internacao(String id, LocalDateTime dataEntrada, LocalDateTime dataPrevistaAlta,
-            LocalDateTime dataEfetivaAlta, Paciente paciente, Profissional responsavel,
-            Quarto quarto, List<Observacao> observacoes) {
-        this.id = id;
+            Paciente paciente, Profissional responsavel, Quarto quarto) {
+        if (id == null || id.isBlank() || dataEntrada == null || dataPrevistaAlta == null
+                || paciente == null || responsavel == null || quarto == null) {
+            throw new IllegalArgumentException("Identificador, datas, paciente, responsável e quarto são obrigatórios.");
+        }
+        if (dataPrevistaAlta.isBefore(dataEntrada)) {
+            throw new IllegalArgumentException("Alta prevista não pode anteceder a entrada.");
+        }
+        this.id = id.trim();
         this.dataEntrada = dataEntrada;
         this.dataPrevistaAlta = dataPrevistaAlta;
-        this.dataEfetivaAlta = dataEfetivaAlta;
         this.paciente = paciente;
         this.responsavel = responsavel;
         this.quarto = quarto;
-        this.observacoes = observacoes == null ? new ArrayList<>() : new ArrayList<>(observacoes);
-        if (this.dataEfetivaAlta == null && this.dataEntrada != null
-                && this.dataPrevistaAlta != null
-                && !this.dataPrevistaAlta.isBefore(this.dataEntrada)
-                && this.paciente != null && this.responsavel != null && this.quarto != null) {
-            this.ativa = this.quarto.ocuparVaga();
-            if (this.ativa) {
-                this.paciente.getHistorico().registrarInternacao(this);
-                for (Observacao observacao : this.observacoes) {
-                    this.paciente.getHistorico().registrarObservacao(observacao);
-                }
-            }
+        quarto.ocuparVaga();
+        paciente.getHistorico().registrarInternacao(this);
+    }
+
+    public String getId() { return id; }
+    public LocalDateTime getDataEntrada() { return dataEntrada; }
+    public LocalDateTime getDataPrevistaAlta() { return dataPrevistaAlta; }
+    public LocalDateTime getDataEfetivaAlta() { return dataEfetivaAlta; }
+    public Paciente getPaciente() { return paciente; }
+    public Profissional getResponsavel() { return responsavel; }
+    public Quarto getQuarto() { return quarto; }
+    public boolean isAtiva() { return dataEfetivaAlta == null; }
+    public List<Observacao> getObservacoes() { return List.copyOf(observacoes); }
+
+    public synchronized void darAlta(LocalDateTime dataAlta) {
+        if (!isAtiva()) {
+            throw new IllegalStateException("Internação já encerrada.");
         }
-    }
-
-    public LocalDateTime getDataEfetivaAlta() {
-        return this.dataEfetivaAlta;
-    }
-
-    public boolean isAtiva() {
-        return this.ativa;
-    }
-
-    public void darAlta(LocalDateTime dataAlta) {
-        if (this.ativa && dataAlta != null && !dataAlta.isBefore(this.dataEntrada)) {
-            this.dataEfetivaAlta = dataAlta;
-            this.ativa = false;
-            this.quarto.liberarVaga();
+        if (dataAlta == null || dataAlta.isBefore(dataEntrada)) {
+            throw new IllegalArgumentException("Alta não pode ser nula nem anterior à entrada.");
         }
-    }
-
-public List<Observacao> getObservacoes() {
-        return Collections.unmodifiableList(new ArrayList<>(this.observacoes));
+        quarto.liberarVaga();
+        dataEfetivaAlta = dataAlta;
     }
 
     public Observacao registrarObservacao(Profissional autor, String texto) {
-        if (!this.ativa || autor == null || texto == null || texto.isBlank()) {
-            return null;
+        if (!isAtiva()) {
+            throw new IllegalStateException("Internação já encerrada.");
+        }
+        if (autor == null || texto == null || texto.isBlank()) {
+            throw new IllegalArgumentException("Autor e texto da observação são obrigatórios.");
         }
         Observacao observacao = new Observacao(UUID.randomUUID().toString(),
                 "Observação de internação", texto.trim(), LocalDateTime.now(), "INTERNACAO",
-                autor, this.paciente, null, this);
-        this.observacoes.add(observacao);
-        this.paciente.getHistorico().registrarObservacao(observacao);
+                autor, paciente, null, this);
+        observacoes.add(observacao);
+        paciente.getHistorico().registrarObservacao(observacao);
         return observacao;
     }
 }
