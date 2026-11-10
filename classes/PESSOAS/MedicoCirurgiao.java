@@ -1,5 +1,7 @@
 package PESSOAS;
 
+import Atendimento.ProcedimentoCirurgico;
+
 import ENUMS.AreaAtuacaoCirurgica;
 
 public class MedicoCirurgiao extends Profissional {
@@ -14,4 +16,11 @@ public class MedicoCirurgiao extends Profissional {
     }
 
     public AreaAtuacaoCirurgica getAreaCirurgia() { return areaCirurgia; }
+
+    public void registrar(ProcedimentoCirurgico procedimento) {
+        if (procedimento != null && procedimento.getProfissional() == this
+                && procedimento.getSituacao() != null && procedimento.validarCondicoes()) {
+            procedimento.getPaciente().getHistorico().registrarAtendimento(procedimento);
+        }
+    }
 }

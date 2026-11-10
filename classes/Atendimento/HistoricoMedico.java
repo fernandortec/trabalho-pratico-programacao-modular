@@ -44,4 +44,8 @@ public List<Atendimento> getAtendimentos() {
             this.observacoes.add(observacao);
         }
     }
+
+    public HistoricoMedico consultar() {
+        return new HistoricoMedico(this.atendimentos, this.internacoes, this.observacoes);
+    }
 }

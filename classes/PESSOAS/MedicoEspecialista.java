@@ -1,5 +1,7 @@
 package PESSOAS;
 
+import Atendimento.ConsultaEspecializada;
+
 import ENUMS.AreaAtuacao;
 
 public class MedicoEspecialista extends Profissional {
@@ -14,4 +16,10 @@ public class MedicoEspecialista extends Profissional {
     }
 
     public AreaAtuacao getArea() { return area; }
+
+    public void realizar(ConsultaEspecializada consulta) {
+        if (consulta != null && consulta.getProfissional() == this) {
+            consulta.iniciar();
+        }
+    }
 }

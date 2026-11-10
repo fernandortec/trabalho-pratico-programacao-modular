@@ -1,5 +1,7 @@
 package PESSOAS;
 
+import Atendimento.HistoricoMedico;
+
 public abstract class Profissional {
     private final String registro;
     private final String nome;
@@ -30,4 +32,11 @@ public abstract class Profissional {
     public String getNome() { return nome; }
     public String getTelefone() { return telefone; }
     public String getEmail() { return email; }
+
+    public HistoricoMedico avaliarPaciente(Paciente paciente) {
+        if (paciente == null) {
+            return null;
+        }
+        return paciente.getHistorico().consultar();
+    }
 }
