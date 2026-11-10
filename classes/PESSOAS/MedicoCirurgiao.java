@@ -1,15 +1,17 @@
 package PESSOAS;
 
-public class MedicoCirurgiao extends Profissional {
-    private String areaCirurgia;
+import ENUMS.AreaAtuacaoCirurgica;
 
-    public MedicoCirurgiao(String registro, String nome, String telefone,
-            String email, String areaCirurgia) {
+public class MedicoCirurgiao extends Profissional {
+    private final AreaAtuacaoCirurgica areaCirurgia;
+
+    public MedicoCirurgiao(String registro, String nome, String telefone, String email, AreaAtuacaoCirurgica areaCirurgia) {
         super(registro, nome, telefone, email);
+        if (areaCirurgia == null) {
+            throw new IllegalArgumentException("Área de atuação é obrigatória.");
+        }
         this.areaCirurgia = areaCirurgia;
     }
 
-    public String getAreaCirurgia() {
-        return this.areaCirurgia;
-    }
+    public AreaAtuacaoCirurgica getAreaCirurgia() { return areaCirurgia; }
 }
