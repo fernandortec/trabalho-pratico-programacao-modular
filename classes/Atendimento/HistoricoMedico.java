@@ -45,7 +45,21 @@ public List<Atendimento> getAtendimentos() {
         }
     }
 
-    public HistoricoMedico consultar() {
-        return new HistoricoMedico(this.atendimentos, this.internacoes, this.observacoes);
+    public void consultar() {
+        System.out.println("Histórico médico");
+        System.out.println("Atendimentos: " + atendimentos.size());
+        for (Atendimento atendimento : atendimentos) {
+            System.out.println("- " + atendimento.getClass().getSimpleName());
+        }
+        System.out.println("Internações: " + internacoes.size());
+        for (Internacao internacao : internacoes) {
+            System.out.println("- " + internacao.getId() + " | Entrada: "
+                    + internacao.getDataEntrada() + " | Ativa: " + internacao.isAtiva());
+        }
+        System.out.println("Observações: " + observacoes.size());
+        for (Observacao observacao : observacoes) {
+            System.out.println("- " + observacao.getDataHora() + " | "
+                    + observacao.getTitulo() + ": " + observacao.getDescricao());
+        }
     }
 }

@@ -22,15 +22,14 @@ public class MedicoClinicoGeral extends Profissional {
         }
     }
 
-    public Observacao encaminhar(Paciente paciente, String area) {
+    public void encaminhar(Paciente paciente, String area) {
         if (paciente == null || area == null || area.isBlank()) {
-            return null;
+            return;
         }
         Observacao encaminhamento = new Observacao(UUID.randomUUID().toString(),
                 "Encaminhamento para especialista",
                 "Encaminhamento para a especialidade: " + area.trim(),
                 LocalDateTime.now(), "ENCAMINHAMENTO", this, paciente, null, null);
         paciente.getHistorico().registrarObservacao(encaminhamento);
-        return encaminhamento;
     }
 }
