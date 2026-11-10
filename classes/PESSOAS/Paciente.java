@@ -26,7 +26,11 @@ public class Paciente {
         this.historico = historico == null ? new HistoricoMedico(null, null, null) : historico;
     }
 
-public HistoricoMedico getHistorico() {
+    public String getNome() {
+        return this.nome;
+    }
+
+    public HistoricoMedico getHistorico() {
         return this.historico;
     }
 }

@@ -1,37 +1,37 @@
 package Atendimento;
 
 public class Quarto {
-    private int numeroId;
-    private int andar;
-    private int capacidadeMax;
+    private final int numeroId;
+    private final int andar;
+    private final int capacidadeMax;
+    private int ocupacaoAtual;
 
     public Quarto(int numeroId, int andar, int capacidadeMax) {
+        if (numeroId <= 0 || capacidadeMax <= 0) {
+            throw new IllegalArgumentException("Identificação e capacidade devem ser positivas.");
+        }
         this.numeroId = numeroId;
         this.andar = andar;
         this.capacidadeMax = capacidadeMax;
     }
 
-    private int ocupacaoAtual;
+    public int getNumeroId() { return numeroId; }
+    public int getAndar() { return andar; }
+    public int getCapacidadeMax() { return capacidadeMax; }
+    public synchronized int getOcupacaoAtual() { return ocupacaoAtual; }
+    public synchronized boolean isDisponivel() { return ocupacaoAtual < capacidadeMax; }
 
-    public boolean isDisponivel() {
-        return this.ocupacaoAtual < this.capacidadeMax;
-    }
-
-    public int getOcupacaoAtual() {
-        return this.ocupacaoAtual;
-    }
-
-    boolean ocuparVaga() {
+    synchronized void ocuparVaga() {
         if (!isDisponivel()) {
-            return false;
+            throw new IllegalStateException("Quarto lotado.");
         }
-        this.ocupacaoAtual++;
-        return true;
+        ocupacaoAtual++;
     }
 
-    void liberarVaga() {
-        if (this.ocupacaoAtual > 0) {
-            this.ocupacaoAtual--;
+    synchronized void liberarVaga() {
+        if (ocupacaoAtual == 0) {
+            throw new IllegalStateException("Quarto não possui vagas ocupadas.");
         }
+        ocupacaoAtual--;
     }
 }
